@@ -6,173 +6,309 @@
 <title>国家反诈中心提醒</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; }
+  html { scroll-behavior: smooth; }
   body {
-    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-    background: linear-gradient(165deg, #002f8f 0%, #0040c0 45%, #1a56db 100%);
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+    background: linear-gradient(168deg, #00237e 0%, #0040c0 40%, #0a4fe0 72%, #1a56db 100%);
     color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     min-height: 100vh;
-    padding: 32px 24px;
+    padding: 0 0 44px;
+    position: relative;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* 背景装饰光晕 */
+  .glow { position: fixed; border-radius: 50%; filter: blur(90px); opacity: .28; pointer-events: none; z-index: 0; }
+  .glow-1 { width: 380px; height: 380px; background: #3b82f6; top: -140px; right: -120px; }
+  .glow-2 { width: 340px; height: 340px; background: #60a5fa; top: 42%; left: -160px; }
+  .glow-3 { width: 300px; height: 300px; background: #2563eb; bottom: -100px; right: -80px; }
+  /* 背景网格纹理 */
+  .grid-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 75%);
+  }
+
+  main { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; padding: 56px 26px 0; }
+
+  /* ---------- 顶部区 ---------- */
+  .hero { text-align: center; animation: fadeUp .7s ease both; }
+  .emblem {
+    width: 92px; height: 92px; margin: 0 auto 18px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+    padding: 4px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.25), 0 14px 40px rgba(0,0,0,.35);
+    position: relative;
+  }
+  .emblem::after {
+    content: ""; position: absolute; inset: -14px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.28) 0%, transparent 65%);
+    z-index: -1;
+  }
+  .emblem img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+  .org-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.28);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 999px;
+    padding: 7px 18px;
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    color: #dbeafe;
+    margin-bottom: 20px;
+  }
+  .org-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+
+  h1 {
+    font-size: 31px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    white-space: nowrap;
+    text-shadow: 0 4px 18px rgba(0,0,0,.3);
+    margin-bottom: 12px;
+  }
+  .slogan {
+    font-size: 16px;
+    font-weight: 500;
+    color: rgba(219,234,254,.9);
+    letter-spacing: 1.5px;
+    line-height: 1.7;
+  }
+
+  /* ---------- 计数卡片 ---------- */
+  .count-card {
+    margin-top: 34px;
+    background: linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.07));
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 20px;
+    padding: 24px 20px 22px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 16px 50px rgba(0,0,0,.28);
+    animation: fadeUp .7s .12s ease both;
     position: relative;
     overflow: hidden;
   }
-  /* 背景光晕 */
-  body::before, body::after {
-    content: "";
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: .25;
+  .count-card::before {
+    content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.8), transparent);
   }
-  body::before { width: 340px; height: 340px; background: #3b82f6; top: -120px; right: -100px; }
-  body::after  { width: 300px; height: 300px; background: #60a5fa; bottom: -110px; left: -90px; }
-
-  .shield {
-    width: 96px; height: 96px;
-    position: relative;
-    margin-bottom: 22px;
+  .count-label {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 14px; color: #bfdbfe; letter-spacing: 2px; margin-bottom: 10px;
   }
-  .shield img {
-    width: 100%; height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid rgba(255,255,255,.85);
-    box-shadow: 0 8px 28px rgba(0,0,0,.35);
-  }
-  .badge {
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.25);
-    backdrop-filter: blur(6px);
-    border-radius: 999px;
-    padding: 6px 18px;
-    font-size: 13px;
-    letter-spacing: 2px;
-    color: #dbeafe;
-    margin-bottom: 18px;
-  }
-  h1 {
-    font-size: 30px;
-    font-weight: 800;
-    letter-spacing: 3px;
-    text-shadow: 0 4px 16px rgba(0,0,0,.25);
-    margin-bottom: 10px;
-    text-align: center;
-    white-space: nowrap;
-  }
-  .slogan {
-    font-size: 19px;
-    font-weight: 600;
-    color: #bfdbfe;
-    letter-spacing: 2px;
-    margin-bottom: 34px;
-    text-align: center;
-  }
-  .card {
-    background: rgba(255,255,255,.10);
-    border: 1px solid rgba(255,255,255,.22);
-    border-radius: 18px;
-    padding: 26px 38px;
-    text-align: center;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 12px 40px rgba(0,0,0,.25);
-    margin-bottom: 30px;
-  }
-  .card .label {
-    font-size: 14px;
-    color: #bfdbfe;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-  }
-  .card .num {
-    font-size: 52px;
+  .count-label .icon { font-size: 16px; }
+  .count-num {
+    font-size: 56px;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     letter-spacing: 2px;
-    background: linear-gradient(180deg, #fff, #93c5fd);
+    line-height: 1.15;
+    background: linear-gradient(180deg, #ffffff 20%, #93c5fd 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    line-height: 1.2;
   }
-  .card .unit {
-    font-size: 15px;
-    color: #dbeafe;
-    margin-top: 6px;
-    letter-spacing: 1px;
+  .count-unit { font-size: 13px; color: #dbeafe; margin-top: 8px; letter-spacing: 1.5px; }
+
+  /* ---------- 防骗要点网格 ---------- */
+  .points {
+    margin-top: 22px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    animation: fadeUp .7s .2s ease both;
   }
-  .tips {
-    font-size: 14px;
-    color: rgba(255,255,255,.75);
-    line-height: 1.9;
+  .point {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 16px;
+    padding: 16px 8px 14px;
     text-align: center;
-    max-width: 320px;
-    margin-bottom: 26px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: transform .2s ease, background .2s ease;
   }
-  .tips b { color: #fbbf24; font-weight: 700; }
-  .footer {
-    font-size: 12px;
-    color: rgba(255,255,255,.5);
-    letter-spacing: 2px;
+  .point:active { transform: scale(.97); }
+  .point .p-icon { font-size: 24px; display: block; margin-bottom: 8px; }
+  .point .p-text { font-size: 13px; color: #e2e8f0; line-height: 1.5; letter-spacing: .5px; }
+
+  /* ---------- 下载区 ---------- */
+  .download {
+    margin-top: 34px;
     text-align: center;
-    line-height: 1.8;
+    animation: fadeUp .7s .3s ease both;
+  }
+  .download .d-title {
+    font-size: 17px; font-weight: 700; letter-spacing: 2px; margin-bottom: 4px;
+  }
+  .download .d-sub { font-size: 13px; color: rgba(219,234,254,.85); letter-spacing: 1px; margin-bottom: 18px; }
+  .download .d-divider {
+    display: flex; align-items: center; gap: 12px;
+    color: rgba(219,234,254,.6); font-size: 12px; letter-spacing: 2px;
+    margin-bottom: 18px;
+  }
+  .download .d-divider::before, .download .d-divider::after {
+    content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+  }
+  .qr-card {
+    display: inline-block;
+    background: #fff;
+    border-radius: 18px;
+    padding: 14px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    position: relative;
+  }
+  .qr-card img { display: block; width: 190px; height: 190px; border-radius: 8px; }
+  .qr-badge {
+    position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff6b6b, #f43f5e);
+    color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    padding: 4px 14px; border-radius: 999px;
+    box-shadow: 0 6px 16px rgba(244,63,94,.45);
+    white-space: nowrap;
+  }
+  .qr-hint {
+    margin-top: 14px;
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 13px; color: #e2e8f0; letter-spacing: 1px;
+  }
+  .qr-hint .os { display: inline-flex; align-items: center; gap: 4px; }
+  .qr-hint .os b { font-weight: 700; color: #fff; }
+  .qr-hint .sep { width: 1px; height: 12px; background: rgba(255,255,255,.3); }
+  .d-foot { margin-top: 12px; font-size: 12px; color: rgba(219,234,254,.7); letter-spacing: 1px; }
+
+  /* ---------- 底部 ---------- */
+  footer {
+    margin-top: 38px;
+    text-align: center;
+    animation: fadeUp .7s .38s ease both;
+  }
+  .hotline {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.1);
+    border: 1px dashed rgba(255,255,255,.3);
+    border-radius: 14px;
+    padding: 12px 22px;
+    font-size: 15px; letter-spacing: 1px; color: #fbbf24;
+    margin-bottom: 16px;
+  }
+  .hotline b { font-size: 19px; }
+  .copyright { font-size: 12px; color: rgba(255,255,255,.55); line-height: 2; letter-spacing: 1.5px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 360px) {
+    h1 { font-size: 27px; letter-spacing: 2px; }
+    .count-num { font-size: 48px; }
+    .qr-card img { width: 170px; height: 170px; }
   }
 </style>
 </head>
 <body>
-  <div class="shield">
-    <img src="assets/logo.png" alt="国家反诈中心徽章">
-  </div>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="glow glow-3"></div>
+  <div class="grid-bg"></div>
 
-  <div class="badge">国家反诈中心 · 官方提醒</div>
-  <h1>陌生二维码 不要乱扫！</h1>
-  <div class="slogan">不明链接不点击 · 陌生码不识别 · 验证码不透露</div>
+  <main>
+    <!-- 顶部 -->
+    <section class="hero">
+      <div class="emblem"><img src="assets/logo.png" alt="国家反诈中心徽章"></div>
+      <div class="org-badge"><span class="dot"></span>国家反诈中心 · 官方提醒</div>
+      <h1>陌生二维码 不要乱扫！</h1>
+      <div class="slogan">不明链接不点击 · 陌生码不识别 · 验证码不透露</div>
+    </section>
 
-  <div class="card">
-    <div class="label">已收到本提醒</div>
-    <div class="num" id="count">--</div>
-    <div class="unit">人（每扫码一次 +1）</div>
-  </div>
+    <!-- 计数 -->
+    <section class="count-card">
+      <div class="count-label"><span class="icon">🛡️</span>已收到本提醒</div>
+      <div class="count-num" id="count">1,258</div>
+      <div class="count-unit">人（每扫码一次 +1）</div>
+    </section>
 
-  <div class="tips">
-    骗子常把木马链接、钓鱼网站伪装成二维码，<br>
-    扫一下<b>钱袋子</b>就可能被掏空。<br>
-    如遇可疑，请拨打 <b>96110</b> 反诈专线咨询。
-  </div>
+    <!-- 防骗要点 -->
+    <section class="points">
+      <div class="point"><span class="p-icon">🚫</span><div class="p-text">不明链接<br>不点击</div></div>
+      <div class="point"><span class="p-icon">📵</span><div class="p-text">陌生二维码<br>不识别</div></div>
+      <div class="point"><span class="p-icon">🔐</span><div class="p-text">验证码<br>不透露</div></div>
+    </section>
 
-  <div class="footer">国家反诈中心 · 公安部刑事侦查局<br>谨防电信网络诈骗，守护你的钱袋子</div>
+    <!-- 下载区 -->
+    <section class="download">
+      <div class="d-title">下载国家反诈中心 APP</div>
+      <div class="d-sub">开启来电预警 · 守好钱袋子</div>
+      <div class="d-divider">扫码下载</div>
+      <div class="qr-card">
+        <span class="qr-badge">官方下载</span>
+        <img src="assets/qr_download.png" alt="国家反诈中心APP下载二维码">
+      </div>
+      <div class="qr-hint">
+        <span class="os"><span>🤖</span><b>安卓</b></span>
+        <span class="sep"></span>
+        <span class="os"><span>🍎</span><b>iOS</b></span>
+        <span class="sep"></span>
+        <span>扫码自动识别</span>
+      </div>
+      <div class="d-foot">长按识别 · 亦可前往各大应用商店搜索「国家反诈中心」</div>
+    </section>
+
+    <!-- 底部 -->
+    <footer>
+      <div class="hotline">☎ 反诈专线 <b>96110</b></div>
+      <div class="copyright">国家反诈中心 · 公安部刑事侦查局<br>谨防电信网络诈骗，守护你的钱袋子</div>
+    </footer>
+  </main>
 
 <script>
 (function () {
-  var BASE = 1258;            // 起始数
+  var BASE = 1258;
   var KEY = "fz-reminder-scan";
   var el = document.getElementById("count");
+  var target = BASE + 1;
 
-  function show(n) {
-    el.textContent = n.toLocaleString("zh-CN");
+  // 数字滚动动画（从 BASE 滚动到目标值）
+  function animate(n) {
+    var start = BASE, end = n, t0 = null;
+    function step(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / 900, 1);
+      var eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      el.textContent = Math.round(start + (end - start) * eased).toLocaleString("zh-CN");
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
   }
 
-  function fmt(n) {
-    return (BASE + n).toLocaleString("zh-CN");
-  }
-
-  // 首选：真实全局计数 API（counterapi.dev）
+  // 首选：真实全局计数 API
   fetch("https://api.counterapi.dev/v1/fz-reminder/scan/up", { cache: "no-store" })
     .then(function (r) { return r.json(); })
     .then(function (d) {
-      if (d && typeof d.count === "number") show(fmt(d.count));
+      if (d && typeof d.count === "number") animate(BASE + d.count);
+      else animate(target);
     })
     .catch(function () {
-      // 降级：本地计数（每台设备各自累计，至少数字会动）
       try {
         var v = parseInt(localStorage.getItem(KEY) || "0", 10) + 1;
         localStorage.setItem(KEY, String(v));
-        show(fmt(v));
+        animate(BASE + v);
       } catch (e) {
-        show("1,259");
+        animate(target);
       }
     });
 })();
