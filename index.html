@@ -83,9 +83,22 @@
     line-height: 1.7;
   }
 
+  /* ---------- 警告行（与 h1 同字号） ---------- */
+  .warn {
+    margin-top: 30px;
+    font-size: 31px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-align: center;
+    line-height: 1.35;
+    color: #fff;
+    text-shadow: 0 4px 18px rgba(0,0,0,.3);
+    animation: fadeUp .7s .08s ease both;
+  }
+
   /* ---------- 计数卡片 ---------- */
   .count-card {
-    margin-top: 34px;
+    margin-top: 20px;
     background: linear-gradient(160deg, rgba(255,255,255,.14), rgba(255,255,255,.07));
     border: 1px solid rgba(255,255,255,.22);
     border-radius: 20px;
@@ -108,6 +121,12 @@
     font-size: 14px; color: #bfdbfe; letter-spacing: 2px; margin-bottom: 10px;
   }
   .count-label .icon { font-size: 16px; }
+  .count-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 2ch;               /* 数字与人之间留两格 */
+  }
   .count-num {
     font-size: 56px;
     font-weight: 800;
@@ -119,7 +138,19 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  .count-unit { font-size: 13px; color: #dbeafe; margin-top: 8px; letter-spacing: 1.5px; }
+  .count-human {
+    font-size: 28px;
+    font-weight: 600;
+    color: #dbeafe;
+    letter-spacing: 1px;
+  }
+  .count-note {
+    font-size: 13px;
+    font-weight: 400;
+    color: #93c5fd;
+    letter-spacing: 1px;
+    margin-left: 8px;
+  }
 
   /* ---------- 防骗要点网格 ---------- */
   .points {
@@ -215,6 +246,7 @@
 
   @media (max-width: 360px) {
     h1 { font-size: 27px; letter-spacing: 2px; }
+    .warn { font-size: 27px; }
     .count-num { font-size: 48px; }
     .qr-card img { width: 170px; height: 170px; }
   }
@@ -235,11 +267,16 @@
       <div class="slogan">不明链接不点击 · 陌生码不识别 · 验证码不透露</div>
     </section>
 
+    <!-- 警告 -->
+    <div class="warn">！你TM再动我车我跟你拼命！</div>
+
     <!-- 计数 -->
     <section class="count-card">
       <div class="count-label"><span class="icon">🛡️</span>已收到本提醒</div>
-      <div class="count-num" id="count">1,258</div>
-      <div class="count-unit">人（每扫码一次 +1）</div>
+      <div class="count-line">
+        <span class="count-num" id="count">1,258</span>
+        <span class="count-human">人<span class="count-note">（每扫码一次 +1）</span></span>
+      </div>
     </section>
 
     <!-- 防骗要点 -->
@@ -281,6 +318,7 @@
   var KEY = "fz-reminder-scan";
   var el = document.getElementById("count");
   var target = BASE + 1;
+  var done = false;
 
   // 数字滚动动画（从 BASE 滚动到目标值）
   function animate(n) {
@@ -295,22 +333,32 @@
     requestAnimationFrame(step);
   }
 
-  // 首选：真实全局计数 API
-  fetch("https://api.counterapi.dev/v1/fz-reminder/scan/up", { cache: "no-store" })
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-      if (d && typeof d.count === "number") animate(BASE + d.count);
-      else animate(target);
-    })
-    .catch(function () {
-      try {
-        var v = parseInt(localStorage.getItem(KEY) || "0", 10) + 1;
-        localStorage.setItem(KEY, String(v));
-        animate(BASE + v);
-      } catch (e) {
-        animate(target);
-      }
-    });
+  // 本地降级：每台设备各自累计
+  function localFallback() {
+    if (done) return;
+    try {
+      var v = parseInt(localStorage.getItem(KEY) || "0", 10) + 1;
+      localStorage.setItem(KEY, String(v));
+      animate(BASE + v);
+    } catch (e) {
+      animate(target);
+    }
+    done = true;
+  }
+
+  // 国内计数服务：不蒜子 busuanzi（page_pv 每次访问 +1，按 Referer 识别站点）
+  window.fzCount = function (data) {
+    if (data && typeof data.page_pv === "number") {
+      animate(BASE + data.page_pv);
+      done = true;
+    }
+  };
+  var s = document.createElement("script");
+  s.src = "https://busuanzi.ibruce.info/busuanzi?jsonpCallback=fzCount";
+  document.head.appendChild(s);
+
+  // 5 秒没响应就降级本地计数
+  setTimeout(localFallback, 5000);
 })();
 </script>
 </body>
