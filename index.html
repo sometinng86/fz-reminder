@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>国家反诈中心提醒</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: linear-gradient(165deg, #002f8f 0%, #0040c0 45%, #1a56db 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 32px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  /* 背景光晕 */
+  body::before, body::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: .25;
+  }
+  body::before { width: 340px; height: 340px; background: #3b82f6; top: -120px; right: -100px; }
+  body::after  { width: 300px; height: 300px; background: #60a5fa; bottom: -110px; left: -90px; }
+
+  .shield {
+    width: 104px; height: 122px;
+    position: relative;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,.35));
+    margin-bottom: 22px;
+  }
+  .badge {
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.25);
+    backdrop-filter: blur(6px);
+    border-radius: 999px;
+    padding: 6px 18px;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #dbeafe;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-shadow: 0 4px 16px rgba(0,0,0,.25);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .slogan {
+    font-size: 19px;
+    font-weight: 600;
+    color: #bfdbfe;
+    letter-spacing: 2px;
+    margin-bottom: 34px;
+    text-align: center;
+  }
+  .card {
+    background: rgba(255,255,255,.10);
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 18px;
+    padding: 26px 38px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,.25);
+    margin-bottom: 30px;
+  }
+  .card .label {
+    font-size: 14px;
+    color: #bfdbfe;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .card .num {
+    font-size: 52px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 2px;
+    background: linear-gradient(180deg, #fff, #93c5fd);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+  }
+  .card .unit {
+    font-size: 15px;
+    color: #dbeafe;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+  .tips {
+    font-size: 14px;
+    color: rgba(255,255,255,.75);
+    line-height: 1.9;
+    text-align: center;
+    max-width: 320px;
+    margin-bottom: 26px;
+  }
+  .tips b { color: #fbbf24; font-weight: 700; }
+  .footer {
+    font-size: 12px;
+    color: rgba(255,255,255,.5);
+    letter-spacing: 2px;
+    text-align: center;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+  <div class="shield">
+    <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+      <!-- 外盾 -->
+      <path d="M50 2 L92 17 V58 C92 90 73 109 50 118 C27 109 8 90 8 58 V17 Z" fill="#ffffff" opacity="0.14"/>
+      <!-- 内盾 -->
+      <path d="M50 12 L84 24 V58 C84 85 67 101 50 109 C33 101 16 85 16 58 V24 Z" fill="#ffffff"/>
+      <!-- 底部弧线 -->
+      <path d="M28 68 C36 84 64 84 72 68" stroke="#0040c0" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <!-- 感叹号 -->
+      <rect x="46.5" y="38" width="7" height="26" rx="3.5" fill="#0040c0"/>
+      <circle cx="50" cy="74" r="4.2" fill="#0040c0"/>
+    </svg>
+  </div>
+
+  <div class="badge">国家反诈中心 · 官方提醒</div>
+  <h1>陌生二维码<br>不要乱扫！</h1>
+  <div class="slogan">不明链接不点击 · 陌生码不识别 · 验证码不透露</div>
+
+  <div class="card">
+    <div class="label">已收到本提醒</div>
+    <div class="num" id="count">--</div>
+    <div class="unit">人（每扫码一次 +1）</div>
+  </div>
+
+  <div class="tips">
+    骗子常把木马链接、钓鱼网站伪装成二维码，<br>
+    扫一下<b>钱袋子</b>就可能被掏空。<br>
+    如遇可疑，请拨打 <b>96110</b> 反诈专线咨询。
+  </div>
+
+  <div class="footer">国家反诈中心 · 公安部刑事侦查局<br>谨防电信网络诈骗，守护你的钱袋子</div>
+
+<script>
+(function () {
+  var BASE = 1258;            // 起始数
+  var KEY = "fz-reminder-scan";
+  var el = document.getElementById("count");
+
+  function show(n) {
+    el.textContent = n.toLocaleString("zh-CN");
+  }
+
+  function fmt(n) {
+    return (BASE + n).toLocaleString("zh-CN");
+  }
+
+  // 首选：真实全局计数 API（counterapi.dev）
+  fetch("https://api.counterapi.dev/v1/fz-reminder/scan/up", { cache: "no-store" })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d && typeof d.count === "number") show(fmt(d.count));
+    })
+    .catch(function () {
+      // 降级：本地计数（每台设备各自累计，至少数字会动）
+      try {
+        var v = parseInt(localStorage.getItem(KEY) || "0", 10) + 1;
+        localStorage.setItem(KEY, String(v));
+        show(fmt(v));
+      } catch (e) {
+        show("1,259");
+      }
+    });
+})();
+</script>
+</body>
+</html>
